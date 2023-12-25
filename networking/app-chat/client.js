@@ -27,6 +27,8 @@ const moveCursor = (dx, dy) => {
 
 const question = util.promisify(rl.question).bind(rl);
 
+let id;
+
 const socket = net.createConnection({ host: "127.0.0.1", port:3008 },async () => { //three way handshake 
     console.log('Connected to the server!')
 
@@ -37,7 +39,7 @@ const socket = net.createConnection({ host: "127.0.0.1", port:3008 },async () =>
         // clear the current line that the cursor is in
         await clearLine(0)
         // send the message to the server
-        socket.write(message)
+        socket.write(`${id}-message-${message}`)
     }
 
     ask()
@@ -46,7 +48,14 @@ const socket = net.createConnection({ host: "127.0.0.1", port:3008 },async () =>
         console.log();
         await moveCursor(0, -1)
         await clearLine(0)
-        console.log(data.toString('utf-8'))
+        if(data.toString('utf-8').substring(0, 2) === "id") {
+            // when we are getting the id
+            id = data.toString('utf-8').substring(3)
+            console.log(`Your id is ${id}! \n`)
+        } else {
+            // when we are getting the message
+            console.log(data.toString('utf-8'))
+        }
         ask()
     })
 }) 
