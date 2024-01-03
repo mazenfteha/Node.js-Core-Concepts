@@ -3,11 +3,11 @@ const fs = require("fs/promises");
 
 const server = net.createServer(() => {})
 
-let fileHandle, fileWriteStream
 
 server.on('connection', (socket) => {
     console.log("New connection!")
-
+    let fileHandle, fileWriteStream
+    
     socket.on("data", async (data) => {
         if(!fileHandle) {     // If file handle doesn't exist, create one and start writing to a file
             socket.pause()
