@@ -11,11 +11,17 @@ server.on('connection', (socket) => {
     socket.on("data", async (data) => {
         if(!fileHandle) {     // If file handle doesn't exist, create one and start writing to a file
             socket.pause()
-            fileHandle = await fs.open(`storage/test.txt`, "w")
+
+            // extract the file name from client socket
+            const indexOfDriver = data.indexOf("-------")
+            const fileName = data.subarray(10, indexOfDriver).toString('utf-8')
+
+
+            fileHandle = await fs.open(`storage/${fileName}`, "w")
             fileWriteStream = fileHandle.createWriteStream() //stream to write to
     
             // Writing to our dest file
-            fileWriteStream.write(data)
+            fileWriteStream.write(data.subarray(indexOfDriver + 7))
 
             socket.resume(); // resume receiving data from the client
             fileWriteStream.on('drain', () => {
