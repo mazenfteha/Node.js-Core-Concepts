@@ -1,4 +1,4 @@
-const Fteha = require('./fteha')
+const Fteha = require('../fteha')
 
 const server = new Fteha();
 
