@@ -15,12 +15,13 @@ const POSTS = [
     }
 ]
 
-const PORT = 8000;
+const PORT = 9001;
 
 const server = new Fteha();
 
 //---------------Files Routes-------//
 server.route('get', '/', (req, res) => {
+    console.log('server-1 is now handling this request')
     res.sendFile('./public/index.html', "text/html")
 })
 
