@@ -120,7 +120,20 @@ server.route("post", "/api/login", (req, res) => {
 });
 
 // Log a user out
-server.route('delete', '/api/logout', (req, res) => {})
+server.route("delete", "/api/logout", (req, res) => {
+    // Remove the session object form the SESSIONS array
+    const sessionIndex = SESSTIONS.findIndex(
+        (session) => session.userId === req.userId
+    );
+    if (sessionIndex > -1) {
+        SESSTIONS.splice(sessionIndex, 1);
+    }
+    res.setHeader(
+        "Set-Cookie",
+        `token=deleted; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT`
+    );
+    res.status(200).json({ message: "Logged out successfully!" });
+});
 
 // Send user info
 server.route('get', '/api/user', (req, res) => {
@@ -129,10 +142,44 @@ server.route('get', '/api/user', (req, res) => {
 })
 
 // update a profile
-server.route('put', '/api/user', (req, res) => {})
+server.route("put", "/api/user", (req, res) => {
+    const username = req.body.username;
+    const name = req.body.name;
+    const password = req.body.password;
+
+    // Grab the user object that is currently logged in
+    const user = USERS.find((user) => user.id === req.userId);
+
+    user.username = username;
+    user.name = name;
+
+    // Only update the password if it is provided
+    if (password) {
+        user.password = password;
+    }
+
+    res.status(200).json({
+        username: user.username,
+        name: user.name,
+        password_status: password ? "updated" : "not updated",
+    });
+});
 
 // create a post
-server.route('post', '/api/posts', (req, res) => {})
+server.route("post", "/api/posts", (req, res) => {
+    const title = req.body.title; // the title of the post
+    const body = req.body.body; // the body of the post
+
+    const post = {
+        id: POSTS.length + 1,
+        title: title,
+        body: body,
+        userId: req.userId,
+    };
+
+    POSTS.unshift(post);
+    res.status(201).json(post);
+});
 
 server.route('get', '/api/posts', (req, res) => {
     const posts = POSTS.map((post) => {
